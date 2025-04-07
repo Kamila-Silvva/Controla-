@@ -19,6 +19,13 @@ const Home = () => {
           </div>
         </Link>
 
+        <Link to="/Login" className="module-card programacao-module">
+          <h2>Tela de Login</h2>
+          <p>Login Cadastro e Redefinição de senha</p>
+          <div className="module-stats">
+          </div>
+        </Link>
+
         <Link to="/programacao" className="module-card programacao-module">
           <h2>Programação Financeira</h2>
           <p>Planeje seus gastos e recebimentos</p>
@@ -34,6 +41,7 @@ const Home = () => {
             <span>42% de redução</span>
           </div>
         </div>
+        
 
         <div className="module-card metas-module">
           <h2>Metas</h2>
@@ -52,6 +60,8 @@ const Home = () => {
           Registrar Recebimento
         </button>
       </div>
+
+      
 
       <div className="home-alert urgent">
         ⚠️ Atenção: Você gastou R$ 150 com compras por impulso nos últimos 3 dias

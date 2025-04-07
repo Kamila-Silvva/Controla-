@@ -12,20 +12,28 @@ const ProjecaoFinanceira = ({ gastos, recebimentos, metas }) => {
     setMesExpandido(mesExpandido === index ? null : index);
   };
 
-  const calcularGastosMes = (mesIndex) => {
-    let total = gastos.reduce((total, gasto) => {
-      if (gasto.frequencia === 'mensal') return total + gasto.valor;
-      if (gasto.frequencia === 'trimestral' && mesIndex % 3 === 0) return total + gasto.valor;
-      if (gasto.frequencia === 'semestral' && (mesIndex === 0 || mesIndex === 6)) return total + gasto.valor;
-      if ((gasto.frequencia === 'anual' || gasto.frequencia === 'único') && new Date(gasto.data).getMonth() === mesIndex) {
-        return total + gasto.valor;
-      }
-      return total;
-    }, 0);
+const calcularGastosMes = (mesIndex) => {
+  let total = gastos.reduce((total, gasto) => {
+    if (gasto.frequencia === 'mensal') return total + gasto.valor;
+    if (gasto.frequencia === 'trimestral' && mesIndex % 3 === 0) return total + gasto.valor;
+    if (gasto.frequencia === 'semestral' && (mesIndex === 0 || mesIndex === 6)) return total + gasto.valor;
+    if ((gasto.frequencia === 'anual' || gasto.frequencia === 'único') && new Date(gasto.data).getMonth() === mesIndex) {
+      return total + gasto.valor;
+    }
+    return total;
+  }, 0);
 
-    return total + metas.reduce((totalMeta, meta) => totalMeta + meta.valorMensal, 0);
-  };
+  // Modificação para considerar apenas o prazo da meta
+  const totalMetas = metas.reduce((totalMeta, meta) => {
+    // Verifica se o mês atual está dentro do prazo da meta
+    if (mesIndex < meta.prazo) {
+      return totalMeta + meta.valorMensal;
+    }
+    return totalMeta;
+  }, 0);
 
+  return total + totalMetas;
+};
   const calcularRecebimentosMes = (mesIndex) => {
     return recebimentos.reduce((total, recebimento) => {
       if (recebimento.frequencia === 'mensal') return total + recebimento.valor;
@@ -48,13 +56,15 @@ const ProjecaoFinanceira = ({ gastos, recebimentos, metas }) => {
       }
       return false;
     });
-
-    const gastosMetas = metas.map((meta) => ({
-      descricao: `Meta: ${meta.descricao}`,
-      valor: meta.valorMensal,
-      frequencia: 'mensal',
-    }));
-
+  
+    const gastosMetas = metas
+      .filter(meta => mesIndex < meta.prazo) // Filtra apenas metas que devem aparecer neste mês
+      .map((meta) => ({
+        descricao: `Meta: ${meta.descricao} (${mesIndex + 1}/${meta.prazo})`,
+        valor: meta.valorMensal,
+        frequencia: 'mensal',
+      }));
+  
     return [...gastosNormais, ...gastosMetas];
   };
 
